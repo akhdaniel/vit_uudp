@@ -554,12 +554,13 @@ class UudpPurchaseOrder(models.Model):
     down_payment = fields.Float(string='DP', digits=dp.get_precision('Product Unit of Measure'), default=0, required=True, help='Masukkan semua total penyelesaian')
     payment_id = fields.Many2one(comodel_name='account.payment', string='Payment', ondelete='restrict')
 
-    @api.onchange('purchase_id')
-    def purchase_change(self):
-        if self.purchase_id :
-            self.down_payment = self.purchase_id.amount_total
-        else :
-            self.down_payment = False
+    ################### Tutup onchange supaya di isi total semua penyelesaian ####################
+    # @api.onchange('purchase_id')
+    # def purchase_change(self):
+    #     if self.purchase_id :
+    #         self.down_payment = self.purchase_id.amount_total
+    #     else :
+    #         self.down_payment = False
 
 class UudpAccountInvoice(models.Model):
     _name = "uudp.account.invoice"
