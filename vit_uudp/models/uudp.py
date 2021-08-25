@@ -228,7 +228,7 @@ class uudp(models.Model):
                               ('cancel', 'Cancelled'),
                               ('refuse','Refused')], default='draft', required=True, index=True, track_visibility='onchange',)
     uudp_ids = fields.One2many("uudp.detail", inverse_name="uudp_id", track_visibility='onchange',)
-    coa_debit = fields.Many2one("account.account", string="Account UUDP", required=True, )
+    coa_debit = fields.Many2one("account.account", string="Account UUDP")
     coa_kredit = fields.Many2one("account.account", string="Credit Account")
     ajuan_id = fields.Many2one('uudp', string="Ajuan", domain="[('type','=','pengajuan')]")
     total_ajuan = fields.Float(string="Total Ajuan", track_visibility='onchange',)
