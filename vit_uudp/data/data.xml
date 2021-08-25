@@ -7,12 +7,62 @@
             <field name="interval_type">days</field>
             <field name="numbercall">-1</field>
             <field name="user_id" ref="base.user_root" />
+            <field name="model_id" ref="model_uudp"/>
             <field name="nextcall" eval="(DateTime.now() + timedelta(hours=24)).strftime('%Y-%m-%d 15:00:00')" />
             <field name="active" eval="True"/>
             <field name="doall" eval="False"/>
             <field name="model" eval="'uudp'"/>
             <field name="function" eval="'alert_uudp_penyelesaian'"/>
             <field name="args" eval="'(None,)'" />
+        </record>
+
+        <!-- CoA -->
+        <record model="account.account" id="coa_uudp">
+            <field name="code">6-920000</field>
+            <field name="name">UUDP</field>
+            <field name="user_type_id" ref="account.data_account_type_prepayments"/>
+            <field name="reconcile">True</field>
+        </record>
+
+        <record model="account.account" id="coa_piutang_uudp">
+            <field name="code">1-900000</field>
+            <field name="name">Piutang UUDP</field>
+            <field name="user_type_id" ref="account.data_account_type_receivable"/>
+            <field name="reconcile">True</field>
+        </record>
+
+        <!-- Product -->
+        <record model="product.template" id="product_uudp">
+            <field name="name">UUDP</field>
+            <field name="default_code">UUDP</field>
+            <field name="can_be_expensed">True</field>
+            <field name="uudp">True</field>
+            <field name="type">service</field>
+            <field name="list_price">1.0</field>
+            <field name="standard_price">1.0</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+            <field name="property_account_expense_id" ref="vit_uudp.coa_uudp"/>
+        </record>
+
+        <record model="product.template" id="product_piutang_uudp">
+            <field name="name">Piutang UUDP</field>
+            <field name="default_code">PIU</field>
+            <field name="can_be_expensed">True</field>
+            <field name="uudp">True</field>
+            <field name="type">service</field>
+            <field name="list_price">1.0</field>
+            <field name="standard_price">1.0</field>
+            <field name="uom_id" ref="product.product_uom_unit"/>
+            <field name="uom_po_id" ref="product.product_uom_unit"/>
+            <field name="property_account_expense_id" ref="vit_uudp.coa_piutang_uudp"/>
+        </record>
+
+        <!-- Journal -->
+        <record model="account.journal" id="journal_uudp">
+            <field name="code">uudp</field>
+            <field name="name">UUDP</field>
+            <field name="type">purchase</field>
         </record>
 
 

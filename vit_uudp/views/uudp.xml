@@ -275,10 +275,11 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Information"  groups="account.group_account_manager">
+                        <page string="Accounting"  groups="account.group_account_manager">
                             <group>
                                 <group>
                                     <field name="coa_debit" domain="[('company_id','=',company_id)]" attrs="{'readonly':[('state','=','done')]}"  options='{"no_create": 1, "no_open": 1}'/>
+                                    <field name="journal_entry_id" options='{"no_create": 1}' attrs="{'invisible': [('journal_entry_id','=',False)]}" />
                                 </group>
                             </group>
                         </page>                        

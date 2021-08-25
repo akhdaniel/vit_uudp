@@ -8,7 +8,7 @@ _logger = logging.getLogger(__name__)
 class uudp(models.Model):
     _name = 'uudp'
     _order = 'name desc'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
 
     #########################
@@ -28,10 +28,10 @@ class uudp(models.Model):
         hrd_partner_ids           = hrd.users.mapped('partner_id')
         finance_ids               = finance.users.mapped('partner_id')
 
-        uudp_user_partners    =  map(lambda x:x['id'],uudp_user_partner_ids)
-        uudp_manager_partners =  map(lambda x:x['id'],uudp_manager_partner_ids)
-        hrd_partners          =  map(lambda x:x['id'],hrd_partner_ids)
-        finance_partners      =  map(lambda x:x['id'],finance_ids)
+        uudp_user_partners    =  uudp_user_partner_ids.ids
+        uudp_manager_partners =  uudp_manager_partner_ids.ids
+        hrd_partners          =  hrd_partner_ids.ids
+        finance_partners      =  finance_ids.ids
 
         receivers = False
 
@@ -47,7 +47,7 @@ class uudp(models.Model):
         body = 'UUDP '+ str(self.type) + ' ' +str(state)
         messages = self.message_post(body=body, subject=subject)
         messages.update({'needaction_partner_ids' : [(6, 0, receivers)]})
-        print body
+        print(body)
         return True
 
     ##########################################################################
@@ -96,7 +96,7 @@ class uudp(models.Model):
             product = self.env['product.product']
             product_uudp = False
             for line in uudp_detail:
-                print line
+                print(line)
 
                 #kode 0 berarti record baru
                 #kode 1 berarti record diupdate
@@ -152,7 +152,7 @@ class uudp(models.Model):
 
     def _default_journal(self):
         return self.env.context.get('default_journal_id') or self.env['account.journal'].search([('name', 'ilike', 'Miscellaneous Operation'),
-                                                                                              ('company_id','=',self.env['res.company']._company_default_get().id)], limit=1)
+                                                                                                ('company_id','=',self.env['res.company']._company_default_get().id)], limit=1)
 
     ################################################################
     # Proteksi tidak bisa membuat pengajuan untuk penerima yg sama # 
@@ -165,7 +165,7 @@ class uudp(models.Model):
                                             ('type','=','pengajuan'),
                                             ('id','!=',self.id),
                                             ('state', 'not in', ['refuse','cancel'])],
-                                             limit=10, order='id desc')
+                                            limit=10, order='id desc')
         if myajuan:
             amount = len(myajuan)
             if amount >= 1:
@@ -190,8 +190,12 @@ class uudp(models.Model):
             ajuan = []
             for juan in self.ajuan_id.uudp_ids :
                 ajuan.append([0,0,{'description'    : juan.description,
+                                    'product_id'    : juan.product_id.id,
+                                    'coa_debit'   	: juan.coa_debit,
                                     'qty'           : juan.qty,
                                     'uom'           : juan.uom,
+                                    'partner_id'    : juan.partner_id.id,
+                                    'store_id'      : juan.store_id.id,
                                     'unit_price'    : juan.unit_price,
                                     'state'         : 'draft',
                                     }])
@@ -224,7 +228,7 @@ class uudp(models.Model):
                               ('cancel', 'Cancelled'),
                               ('refuse','Refused')], default='draft', required=True, index=True, track_visibility='onchange',)
     uudp_ids = fields.One2many("uudp.detail", inverse_name="uudp_id", track_visibility='onchange',)
-    coa_debit = fields.Many2one("account.account", string="Debit Account")
+    coa_debit = fields.Many2one("account.account", string="Account UUDP", required=True, )
     coa_kredit = fields.Many2one("account.account", string="Credit Account")
     ajuan_id = fields.Many2one('uudp', string="Ajuan", domain="[('type','=','pengajuan')]")
     total_ajuan = fields.Float(string="Total Ajuan", track_visibility='onchange',)
@@ -257,6 +261,7 @@ class uudp(models.Model):
     selesai_id = fields.Many2one('uudp','Selesai ID',compute="search_input_penyelesaian")
     penyelesaian_id = fields.Many2one('uudp','Penyelesaian')# store ke db
     tgl_penyelesaian = fields.Date("Tgl Penyelesaian")
+    is_po = fields.Boolean('Purchase Order')
 
     @api.depends('uudp_ids.qty','uudp_ids.unit_price','uudp_ids.sub_total')
     def _get_sisa_penyelesaian(self):
@@ -266,7 +271,7 @@ class uudp(models.Model):
                 total += (u.unit_price*u.qty)
             rec.sisa_penyelesaian = rec.ajuan_id.total_pencairan-total
 
-    @api.depends('is_user_pencairan')
+    # @api.depends('is_user_pencairan')
     def check_validity(self):
         for rec in self:
             user_login = self.env.user.id
@@ -373,10 +378,10 @@ class uudp(models.Model):
                         res = tu.write({'total_pencairan':total})
 
                     if res:
-                        print "edit berhasil"
+                        print("edit berhasil")
                         return True
                     else:
-                        print "edit gagal"
+                        print("edit gagal")
                         return False
         return super(uudp, self).write(vals)
 
@@ -386,6 +391,10 @@ class uudp(models.Model):
             attachment = self.env['ir.attachment'].search([('res_model','=','uudp'),('res_id','=',self.id)])
             if not attachment:
                 raise UserError(_('Attachment masih kosong, silahkan lampirkan file / dokumen pendukung untuk melanjutkan.'))
+
+        ################ Tambah Warning ketika sisa penyelesaian > 0.0 #################
+        if self.type == 'penyelesaian' and round(self.sisa_penyelesaian,2) > 0.0:
+            raise UserError(_('Selisih harus dimasukan ke piutang uudp !'))
 
         self.write_state_line('confirm')
         self.post_mesages_uudp('Confirmed')
@@ -436,7 +445,8 @@ class uudp(models.Model):
 
     @api.multi
     def button_done_finance(self):
-        if self.type == 'penyelesaian':
+        if self.type == 'penyelesaian' and self.is_po == False:
+            print("--------########################")
             partner = self.ajuan_id.responsible_id.partner_id.id
             total_ajuan = 0
             now = datetime.datetime.now()
@@ -657,68 +667,69 @@ class uudp(models.Model):
         account_move = self.env['account.move']
         datas_form = {'state' : 'done'}
         # cek jika journal sdh di create
-        journal_exist = account_move.sudo().search([('ref','=',reference)])
-        if not journal_exist :
-            account_move_line = []
-            for juan in self.uudp_ids :
-                if juan.partner_id :
-                    partner = juan.partner_id.id
-                tag_id = False
-                if juan.store_id and juan.store_id.account_analytic_tag_id :
-                    tag_id = [(6, 0, [juan.store_id.account_analytic_tag_id.id])]
-                if self.type == 'pengajuan' :
-                    debit = self.coa_debit
-                    if not debit :
-                        raise AccessError(_('Debit acount pada ajuan %s belum diisi !') % (self.name) )
-                else :
-                    debit = juan.coa_debit
-                    if not debit :
-                        raise AccessError(_('Debit Account lines pada ajuan %s belum diisi !') % (self.name) )
-                #account debit
-                if juan.sub_total > 0.0 :
-                    account_move_line.append((0, 0 ,{'account_id'       : debit.id,
-                                                    'partner_id'        : partner,
-                                                    'analytic_account_id' : self.department_id.analytic_account_id.id or False,
-                                                    'analytic_tag_ids'  : tag_id,
-                                                    'name'              : juan.description,
-                                                    'debit'             : juan.sub_total,
-                                                    'company_id'        : self.company_id.id,
-                                                    'date'              : self.pencairan_id.tgl_pencairan,
-                                                    'date_maturity'     : self.pencairan_id.tgl_pencairan}))
-                elif juan.sub_total < 0.0 :
-                    account_move_line.append((0, 0 ,{'account_id'       : debit.id,
-                                                    'partner_id'        : partner,
-                                                    'analytic_account_id' : self.department_id.analytic_account_id.id or False,
-                                                    'analytic_tag_ids'  : tag_id,
-                                                    'name'              : juan.description,
-                                                    'credit'            : -juan.sub_total,
-                                                    'date'              : self.pencairan_id.tgl_pencairan,
-                                                    'company_id'        : self.company_id.id,
-                                                    'date_maturity'     : self.pencairan_id.tgl_pencairan}))
-                #account credit bank / hutang
-                notes = self.notes
-                if not notes :
-                    notes= self.coa_kredit.name
-            account_move_line.append((0, 0 ,{'account_id'       : self.pencairan_id.coa_kredit.id,
-                                            'partner_id'        : self.responsible_id.partner_id.id,
-                                            'analytic_account_id' : self.department_id.analytic_account_id.id or False,
-                                            'name'              : notes,
-                                            'credit'            : self.total_ajuan,
-                                            'company_id'        : self.company_id.id,
-                                            'date'              : self.pencairan_id.tgl_pencairan,
-                                            'date_maturity'     : self.pencairan_id.tgl_pencairan}))
+        ################## Dikomen dulu : Tidak ada journal ketika pengajuan ################
+        # journal_exist = account_move.sudo().search([('ref','=',reference)])
+        # if not journal_exist :
+        #     account_move_line = []
+        #     for juan in self.uudp_ids :
+        #         if juan.partner_id :
+        #             partner = juan.partner_id.id
+        #         tag_id = False
+        #         if juan.store_id and juan.store_id.account_analytic_tag_id :
+        #             tag_id = [(6, 0, [juan.store_id.account_analytic_tag_id.id])]
+        #         if self.type == 'pengajuan' :
+        #             debit = self.coa_debit
+        #             if not debit :
+        #                 raise AccessError(_('Debit acount pada ajuan %s belum diisi !') % (self.name) )
+        #         else :
+        #             debit = juan.coa_debit
+        #             if not debit :
+        #                 raise AccessError(_('Debit Account lines pada ajuan %s belum diisi !') % (self.name) )
+        #         #account debit
+        #         if juan.sub_total > 0.0 :
+        #             account_move_line.append((0, 0 ,{'account_id'       : debit.id,
+        #                                             'partner_id'        : partner,
+        #                                             'analytic_account_id' : self.department_id.analytic_account_id.id or False,
+        #                                             'analytic_tag_ids'  : tag_id,
+        #                                             'name'              : juan.description,
+        #                                             'debit'             : juan.sub_total,
+        #                                             'company_id'        : self.company_id.id,
+        #                                             'date'              : self.pencairan_id.tgl_pencairan,
+        #                                             'date_maturity'     : self.pencairan_id.tgl_pencairan}))
+        #         elif juan.sub_total < 0.0 :
+        #             account_move_line.append((0, 0 ,{'account_id'       : debit.id,
+        #                                             'partner_id'        : partner,
+        #                                             'analytic_account_id' : self.department_id.analytic_account_id.id or False,
+        #                                             'analytic_tag_ids'  : tag_id,
+        #                                             'name'              : juan.description,
+        #                                             'credit'            : -juan.sub_total,
+        #                                             'date'              : self.pencairan_id.tgl_pencairan,
+        #                                             'company_id'        : self.company_id.id,
+        #                                             'date_maturity'     : self.pencairan_id.tgl_pencairan}))
+        #         #account credit bank / hutang
+        #         notes = self.notes
+        #         if not notes :
+        #             notes= self.coa_kredit.name
+        #     account_move_line.append((0, 0 ,{'account_id'       : self.pencairan_id.coa_kredit.id,
+        #                                     'partner_id'        : self.responsible_id.partner_id.id,
+        #                                     'analytic_account_id' : self.department_id.analytic_account_id.id or False,
+        #                                     'name'              : notes,
+        #                                     'credit'            : self.total_ajuan,
+        #                                     'company_id'        : self.company_id.id,
+        #                                     'date'              : self.pencairan_id.tgl_pencairan,
+        #                                     'date_maturity'     : self.pencairan_id.tgl_pencairan}))
 
-            data={"journal_id": self.pencairan_id.journal_id.id,
-                  "ref": reference,
-                  "date": self.pencairan_id.tgl_pencairan,
-                  "company_id": self.company_id.id,
-                  "narration": self.pencairan_id.notes,
-                  "terbilang" : terbilang.terbilang(int(round(self.total_ajuan,0)), "IDR", "id"),
-                  "line_ids":account_move_line,}
+        #     data={"journal_id": self.pencairan_id.journal_id.id,
+        #           "ref": reference,
+        #           "date": self.pencairan_id.tgl_pencairan,
+        #           "company_id": self.company_id.id,
+        #           "narration": self.pencairan_id.notes,
+        #           "terbilang" : terbilang.terbilang(int(round(self.total_ajuan,0)), "IDR", "id"),
+        #           "line_ids":account_move_line,}
 
-            journal_entry = account_move.create(data)
-            journal_entry.post()
-            datas_form.update({'journal_entry_id' : journal_entry.id})
+        #     journal_entry = account_move.create(data)
+        #     journal_entry.post()
+        #     datas_form.update({'journal_entry_id' : journal_entry.id})
 
         self.post_mesages_uudp('Done')
         return self.write(datas_form)
@@ -809,7 +820,7 @@ uudp()
 
 class uudpDetail(models.Model):
     _name = "uudp.detail"
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     uudp_id = fields.Many2one("uudp", string="Nomor UUDP", track_visibility='onchange',)
     product_id = fields.Many2one("product.product", string="Product", track_visibility='onchange',)

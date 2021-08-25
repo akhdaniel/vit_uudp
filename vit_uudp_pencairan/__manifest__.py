@@ -20,7 +20,7 @@
 ##############################################################################
 {
     "name": "UUDP Pencairan Parsial",
-    "version": "0.5",
+    "version": "0.6",
     "category": "Extra Tools",
     "sequence": 20,
     "author":  "vITraining",

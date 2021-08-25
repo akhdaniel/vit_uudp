@@ -28,7 +28,7 @@ _logger = logging.getLogger(__name__)
 
 class AccountBankStatement(models.Model):
     _name = "account.bank.statement"
-    _inherit = ['ir.needaction_mixin','mail.thread','account.bank.statement']
+    _inherit = ['mail.activity.mixin','mail.thread','account.bank.statement']
 
     @api.multi
     def check_confirm_bank(self):
@@ -90,7 +90,7 @@ class AccountBankStatement(models.Model):
             info = "Journal entry " +line.journal_entry_ids[0].name+ " Success deleted.." 
             line.button_cancel_reconciliation()
             line._cr.commit()
-            print info
+            print(info)
         # cari jurnal interco dengan ref yg sama
         if self.name :
             int_exist = self.env['account.move'].sudo().search([('ref','=',self.name)])
@@ -109,7 +109,7 @@ class AccountBankStatement(models.Model):
             if line.move_name :
                 info = "Journal entry name" +line.move_name+ " Success deleted.." 
             line.write({'move_name' : False})
-            print info
+            print(info)
         self.other_note = 'Journal entry name success deleted'
 
     # @api.multi
@@ -141,7 +141,7 @@ AccountBankStatement()
 
 class AccountBankStatementLine(models.Model):
     _name = "account.bank.statement.line"
-    _inherit = ['mail.thread','ir.needaction_mixin','account.bank.statement.line']
+    _inherit = ['mail.thread','mail.activity.mixin','account.bank.statement.line']
 
     @api.model
     def create(self, vals):
@@ -359,7 +359,7 @@ class AccountBankStatementLine(models.Model):
 
                     journal_interco = account_move.create(datas)
                     info = "Journal Inter Company "+ str(x.journal_interco_id.company_id.name)+" Created.."
-                    print info
+                    print(info)
                     # journal_interco.post()
                     # extra_info = "Journal Inter Company "+ str(x.company_interco_id.name) +" Posted"
                     # print extra_info

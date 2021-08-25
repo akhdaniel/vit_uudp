@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
-import parsial_report
-import once_report
-import summary_report
+from . import parsial_report
+from . import once_report
+from . import summary_report

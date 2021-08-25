@@ -27,7 +27,7 @@ from odoo.exceptions import UserError
 
 class AccountMoveLine(models.Model):
     _name = "account.move.line"
-    _inherit = ['ir.needaction_mixin','mail.thread','account.move.line']
+    _inherit = ['mail.activity.mixin','mail.thread','account.move.line']
 
     name = fields.Char(required=True, string="Label", track_visibility='onchange')
     debit = fields.Monetary(default=0.0, currency_field='company_currency_id', track_visibility='onchange')
@@ -67,7 +67,7 @@ AccountMoveLine()
 
 class AccountMove(models.Model):
     _name = "account.move"
-    _inherit = ['ir.needaction_mixin','mail.thread','account.move']
+    _inherit = ['mail.activity.mixin','mail.thread','account.move']
 
     @api.multi
     def _get_default_journal(self):
@@ -266,7 +266,7 @@ class AccountPayment(models.Model):
             account_move = self.env["account.move"]
             journal_interco = account_move.create(datas)
             info = "Journal Inter Company "+ str(self.journal_interco_id.company_id.name)+" Created.."
-            print info
+            print(info)
             # journal_interco.post()
             # extra_info = "Journal Inter Company "+ str(self.company_interco_id.name) +" Posted"
             # print extra_info

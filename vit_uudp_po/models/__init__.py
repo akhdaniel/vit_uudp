@@ -1,3 +1,3 @@
-import uudp
-import account_invoice
-import purchase_order
+from . import uudp
+from . import account_invoice
+from . import purchase_order

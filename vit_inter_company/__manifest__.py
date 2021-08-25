@@ -20,7 +20,7 @@
 ##############################################################################
 {
     "name": "Inter Company",
-    "version": "2.1",
+    "version": "2.2",
     "category": "Account",
     "sequence": 20,
     "author":  "vITraining",

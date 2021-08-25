@@ -24,14 +24,14 @@
                      <field name="total_pencairan" attrs="{'invisible': [('type','!=','parsial')]}" readonly="1"/>
                 </xpath>
                 <!-- dihide dulu -->
-<!--                 <xpath expr="//field[@name='journal_id']" position="replace">                   
-                    <field name="journal_id" attrs="{'readonly': [('state','in',('done','cancel','refuse'))]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('company_id','=',company_id),('type','=',('bank','cash','general'))]" required="1" required="1"/>
+                <xpath expr="//field[@name='journal_id']" position="replace">                   
+                    <field name="journal_id" attrs="{'readonly': [('state','in',('done','cancel','refuse'))]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('company_id','=',company_id),('type','in',('bank','cash','general'))]" required="1"/>
                 </xpath>
                 <xpath expr="//field[@name='coa_kredit']" position="replace">
                     <field name="coa_kredit" attrs="{'readonly': [('state','in',('done','cancel','refuse'))],'required': [('journal_id2','=',False)]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('company_id','=',company_id)]"/>
-                    <field name="journal_id2" attrs="{'readonly': [('state','in',('done','cancel','refuse'))]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('interco_journal','=',True),('type','=',('bank','cash')),('company_id','!=',company_id)]" />
+                    <field name="journal_id2" attrs="{'readonly': [('state','in',('done','cancel','refuse'))]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('interco_journal','=',True),('type','in',('bank','cash')),('company_id','!=',company_id)]" />
                     <field name="company_id2" invisible="1"/>
-                </xpath> -->
+                </xpath>
             </field>
         </record>
 
@@ -95,20 +95,21 @@
                 </xpath> -->
 
 <!--                 <xpath expr="//field[@name='uudp_ids']/tree/field[@name='unit_price']" position="after">
-                    <field name="journal_id" attrs="{'readonly': [('state','in',('done','cancel','refuse'))]}" options='{"no_create": 1}' domain="[('interco_journal','=',True),('company_id','!=',parent.company_id),('type','=',('bank','cash','general'))]" groups="account.group_account_manager"/>
+                    <field name="journal_id" attrs="{'readonly': [('state','in',('done','cancel','refuse'))]}" options='{"no_create": 1}' domain="[('interco_journal','=',True),('company_id','!=',parent.company_id),('type','in',('bank','cash','general'))]" groups="account.group_account_manager"/>
                 </xpath> -->
 
                 <xpath expr="//field[@name='journal_entry_id']" position="attributes">
                      <attribute name="invisible">True</attribute>
                 </xpath>
 
-<!--                 <xpath expr="//field[@name='journal_id']" position="replace"/>
+                <xpath expr="//field[@name='journal_id']" position="replace"/>
 
                 <xpath expr="//notebook/page[2]" position="replace">
-                    <page string="Other Info" groups="account.group_account_manager">
+                    <!-- Di hide dulu selisih ditampung di coa -->
+                    <page string="Other Info" invisible="1">
                         <group>
                             <group>
-                                <field name="journal_id" attrs="{'invisible':[('type','in',('reimberse','penyelesaian'))], 'readonly':[('state','=','done')]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('company_id','=',company_id)]"/>
+                                <field name="journal_id" attrs="{'invisible':[('type','not in',('reimberse','penyelesaian'))], 'readonly':[('state','=','done')]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('company_id','=',company_id)]"/>
                             </group>
                             <group>
                                 <field name="coa_kredit" attrs="{'invisible':[('type','in',('reimberse','penyelesaian'))], 'readonly':[('state','in',('confirm_accounting','done'))]}" options='{"no_create": 1, "no_create_edit": 1}' domain="[('company_id','=',company_id)]" />
@@ -124,7 +125,7 @@
                             <group>
                             </group>
                             <group>
-                                <field name="journal_difference_id" attrs="{'invisible':['|',('type','!=','penyelesaian'),('diff_interco','=',False)],'readonly': [('state','=','done')],'required': [('diff_interco','=',True)]}" options='{"no_create": 1}' domain="[('interco_journal','=',True),('company_id','!=',company_id),('type','=',('bank','cash','general'))]" invisible="1"/>
+                                <field name="journal_difference_id" attrs="{'invisible':['|',('type','!=','penyelesaian'),('diff_interco','=',False)],'readonly': [('state','=','done')],'required': [('diff_interco','=',True)]}" options='{"no_create": 1}' domain="[('interco_journal','=',True),('company_id','!=',company_id),('type','in',('bank','cash','general'))]" invisible="1"/>
                                 <field name="difference" attrs="{'invisible':['|',('type','!=','penyelesaian'),('diff_interco','=',True)], 'readonly':[('state','=','done')]}" domain="[('company_id','=',company_id)]" options='{"no_create": 1, "no_create_edit": 1}' string="Account"/>
                                 <field name="difference_notes" attrs="{'invisible':[('type','!=','penyelesaian')], 'readonly':[('state','=','done')],'required':['|',('difference','!=',False),('diff_interco','=',True)]}"/>
                             </group>
@@ -132,7 +133,7 @@
                             </group>
                         </group>
                     </page>
-                </xpath> -->
+                </xpath>
 
 
             </field>

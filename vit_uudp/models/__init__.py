@@ -18,9 +18,9 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-import uudp
-import uudp_pencairan
-import ir_attachment
-import journal
-import pencairan_batches
-import res_users
+from . import uudp
+from . import uudp_pencairan
+from . import ir_attachment
+from . import journal
+from . import pencairan_batches
+from . import res_users

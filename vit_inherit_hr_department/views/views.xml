@@ -1,0 +1,16 @@
+<odoo>
+    <data>   
+
+        <record model="ir.ui.view" id="view_department_form_purchase">
+            <field name="name">hr.department.form</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form"/>
+            <field name="arch" type="xml">               
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="analytic_account_id" options="{'no_open':True,'no_create':True}" domain="[('company_id','=',company_id)]"/>
+                </xpath>
+            </field>
+        </record>     
+
+    </data>
+</odoo> 

@@ -52,22 +52,22 @@ class Uudp(models.Model):
         for me_id in self :
             if me_id.purchase_line :
                 # delete dulu jurnal lama supaya ga double
-                aju = me_id.ajuan_id.name
-                if aju :
-                    entries = self.env['account.move'].sudo().search([('ref','=',me_id.name+ ' - ' + aju)])
-                    if entries :
-                        for ent in entries :
-                            try :
-                                cenceling_journal = False
-                                if ent.journal_id.update_posted :
-                                    ent.write({'update_posted' : False})
-                                    cenceling_journal = True
-                                entries.sudo(SUPERUSER_ID).button_cancel()
-                                if cenceling_journal :
-                                    ent.write({'update_posted' : True})
-                                ent.sudo(SUPERUSER_ID).unlink()
-                            except :
-                                pass
+                # aju = me_id.ajuan_id.name
+                # if aju :
+                #     entries = self.env['account.move'].sudo().search([('ref','=',me_id.name+ ' - ' + aju)])
+                #     if entries :
+                #         for ent in entries :
+                #             try :
+                #                 cenceling_journal = False
+                #                 if ent.journal_id.update_posted :
+                #                     ent.write({'update_posted' : False})
+                #                     cenceling_journal = True
+                #                 entries.sudo(SUPERUSER_ID).button_cancel()
+                #                 if cenceling_journal :
+                #                     ent.write({'update_posted' : True})
+                #                 ent.sudo(SUPERUSER_ID).unlink()
+                #             except :
+                #                 pass
                 for purchase in me_id.purchase_line :
                     if purchase.down_payment <= 0.0:
                         continue
@@ -75,7 +75,7 @@ class Uudp(models.Model):
                         if not me_id.ajuan_id.pencairan_id :
                             raise Warning("Ajuan %s belum dicairkan."%me_id.ajuan_id.name)
                         payment_methods = me_id.ajuan_id.pencairan_id.journal_id.outbound_payment_method_ids
-                        journal_id = me_id.ajuan_id.pencairan_id.journal_id.id
+                        # journal_id = me_id.ajuan_id.pencairan_id.journal_id.id
                         #cari jurnal uudp
                         uudp_journal = self.env['account.journal'].search([('name','=','UUDP'),('company_id','=',me_id.company_id.id)],limit=1) 
                         if uudp_journal :
@@ -93,20 +93,20 @@ class Uudp(models.Model):
                         date = me_id.pencairan_id.tgl_pencairan
                         com = me_id.name + ' - ' + name +' - ' + purchase.purchase_id.name
                     # delete dulu jurnal lama supaya ga double
-                    entries = self.env['account.move'].sudo().search([('ref','=',com)])
-                    if entries :
-                        for ent in entries :
-                            try :
-                                cenceling_journal = False
-                                if ent.journal_id.update_posted :
-                                    ent.write({'update_posted' : False})
-                                    cenceling_journal = True
-                                entries.sudo(SUPERUSER_ID).button_cancel()
-                                if cenceling_journal :
-                                    ent.write({'update_posted' : True})
-                                ent.sudo(SUPERUSER_ID).unlink()
-                            except :
-                                pass
+                    # entries = self.env['account.move'].sudo().search([('ref','=',com)])
+                    # if entries :
+                    #     for ent in entries :
+                    #         try :
+                    #             cenceling_journal = False
+                    #             if ent.journal_id.update_posted :
+                    #                 ent.write({'update_posted' : False})
+                    #                 cenceling_journal = True
+                    #             entries.sudo(SUPERUSER_ID).button_cancel()
+                    #             if cenceling_journal :
+                    #                 ent.write({'update_posted' : True})
+                    #             ent.sudo(SUPERUSER_ID).unlink()
+                    #         except :
+                    #             pass
 
                     payment_method_id = payment_methods and payment_methods[0] or False
                     # cek jika sudah ada memo yg sama maka di by pass
@@ -137,21 +137,21 @@ class Uudp(models.Model):
         for me_id in self :
             if me_id.invoice_line :
                 # delete dulu jurnal lama supaya ga double
-                if me_id.ajuan_id.name :
-                    entries = self.env['account.move'].sudo().search([('ref','=',me_id.name+ ' - ' +me_id.ajuan_id.name)])
-                    if entries :
-                        for ent in entries :
-                            try :
-                                cenceling_journal = False
-                                if ent.journal_id.update_posted :
-                                    ent.write({'update_posted' : False})
-                                    cenceling_journal = True
-                                entries.sudo(SUPERUSER_ID).button_cancel()
-                                if cenceling_journal :
-                                    ent.write({'update_posted' : True})
-                                ent.sudo(SUPERUSER_ID).unlink()
-                            except :
-                                pass
+                # if me_id.ajuan_id.name :
+                #     entries = self.env['account.move'].sudo().search([('ref','=',me_id.name+ ' - ' +me_id.ajuan_id.name)])
+                #     if entries :
+                #         for ent in entries :
+                #             try :
+                #                 cenceling_journal = False
+                #                 if ent.journal_id.update_posted :
+                #                     ent.write({'update_posted' : False})
+                #                     cenceling_journal = True
+                #                 entries.sudo(SUPERUSER_ID).button_cancel()
+                #                 if cenceling_journal :
+                #                     ent.write({'update_posted' : True})
+                #                 ent.sudo(SUPERUSER_ID).unlink()
+                #             except :
+                #                 pass
                 for inv in me_id.invoice_line.filtered(lambda i:i.state == 'open') :
                     if inv.alokasi <= 0.0:
                         continue
@@ -159,7 +159,11 @@ class Uudp(models.Model):
                         if not me_id.ajuan_id.pencairan_id :
                             raise Warning("Ajuan %s belum dicairkan."%me_id.ajuan_id.name)
                         payment_methods = me_id.ajuan_id.pencairan_id.journal_id.outbound_payment_method_ids
-                        journal_id = me_id.ajuan_id.pencairan_id.journal_id.id
+                        # journal_id = me_id.ajuan_id.pencairan_id.journal_id.id
+                        uudp_journal = self.env['account.journal'].search([('name','=','UUDP'),('company_id','=',me_id.company_id.id)],limit=1) 
+                        if uudp_journal :
+                            payment_methods = uudp_journal.outbound_payment_method_ids
+                            journal_id = uudp_journal.id
                         name = me_id.ajuan_id.name
                         date = me_id.date
                         com = me_id.name + ' - ' + name +' - ' + inv.invoice_id.number
@@ -176,20 +180,20 @@ class Uudp(models.Model):
                         date = me_id.pencairan_id.tgl_pencairan
                         com = me_id.name + ' - ' + name +' - ' + inv.invoice_id.number
 
-                    entries = self.env['account.move'].sudo().search([('ref','=',com)])
-                    if entries :
-                        for ent in entries :
-                            try :
-                                cenceling_journal = False
-                                if ent.journal_id.update_posted :
-                                    ent.write({'update_posted' : False})
-                                    cenceling_journal = True
-                                entries.sudo(SUPERUSER_ID).button_cancel()
-                                if cenceling_journal :
-                                    ent.write({'update_posted' : True})
-                                ent.sudo(SUPERUSER_ID).unlink()
-                            except :
-                                pass
+                    # entries = self.env['account.move'].sudo().search([('ref','=',com)])
+                    # if entries :
+                    #     for ent in entries :
+                    #         try :
+                    #             cenceling_journal = False
+                    #             if ent.journal_id.update_posted :
+                    #                 ent.write({'update_posted' : False})
+                    #                 cenceling_journal = True
+                    #             entries.sudo(SUPERUSER_ID).button_cancel()
+                    #             if cenceling_journal :
+                    #                 ent.write({'update_posted' : True})
+                    #             ent.sudo(SUPERUSER_ID).unlink()
+                    #         except :
+                    #             pass
 
                     payment_method_id = payment_methods and payment_methods[0] or False
                     # cek jika sudah ada memo yg sama maka di by pass
@@ -225,8 +229,8 @@ class Uudp(models.Model):
         for me_id in self :
             if not me_id.invoice_line and not me_id.purchase_line :
                 raise ValidationError("Detail PO atau Vendor Bills harus diisi.")
-            if me_id.invoice_line and not me_id.advance_purchase_id :
-                raise ValidationError("Silahkan input advance purchase.")
+            # if me_id.invoice_line and not me_id.advance_purchase_id :
+            #     raise ValidationError("Silahkan input advance purchase.")
             tot_purchase = 0
             for purchase in me_id.purchase_line :
                 if purchase.purchase_id.penyelesaian_id :
@@ -247,8 +251,9 @@ class Uudp(models.Model):
                 if invoice.invoice_id.reimburse_id :
                     if me_id.type == 'reimberse' and invoice.invoice_id.reimburse_id.id != me_id.id  :
                         raise ValidationError("Vendor Bills %s sudah direimburse di %s."%(invoice.invoice_id.name,invoice.invoice_id.reimburse_id.name))
-                if not invoice.company_id.intercompany_payable_id or not invoice.company_id.intercompany_receivable_id :
-                    raise Warning("Silahkan lengkapi intercompany payable dan receivable company %"%(invoice_id.company_id.name))
+                ######### dikomen dulu blm ke intercompany
+                # if not invoice.company_id.intercompany_payable_id or not invoice.company_id.intercompany_receivable_id :
+                #     raise Warning("Silahkan lengkapi intercompany payable dan receivable company %"%(invoice_id.company_id.name))
             tot_penyelesaian = self.get_tot_detail()
             dp = (me_id.tot_alokasi + tot_purchase)
             if round(tot_penyelesaian,2) < round(dp,2):
@@ -500,7 +505,14 @@ class Uudp(models.Model):
                     me_id.update_purchase_invoice()
                     me_id.create_payment()
                     me_id.create_payment_invoice()
-        return super(Uudp, self).button_done_finance()
+        res = super(Uudp, self).button_done_finance()
+        journal = self.env['account.move'].sudo().search([('ref','ilike','%'+self.ajuan_id.name+'%')],limit=1)
+        if journal:
+            self.write_state_line('done')
+            self.ajuan_id.write({'selesai':True})
+            self.post_mesages_uudp('Done')
+            self.write({'state' : 'done', 'journal_entry_id':journal.id})
+        return res
 
     @api.multi
     def button_validate(self):
@@ -539,7 +551,7 @@ class UudpPurchaseOrder(models.Model):
     currency_id = fields.Many2one(related='purchase_id.currency_id', string='Currency')
     state = fields.Selection(related='purchase_id.state', string='State')
     amount_total = fields.Monetary(related='purchase_id.amount_total', string='Amount', digits=dp.get_precision('Product Price'))
-    down_payment = fields.Float(string='DP', digits=dp.get_precision('Product Unit of Measure'), default=0, required=True)
+    down_payment = fields.Float(string='DP', digits=dp.get_precision('Product Unit of Measure'), default=0, required=True, help='Masukkan semua total penyelesaian')
     payment_id = fields.Many2one(comodel_name='account.payment', string='Payment', ondelete='restrict')
 
     @api.onchange('purchase_id')
@@ -560,7 +572,7 @@ class UudpAccountInvoice(models.Model):
     currency_id = fields.Many2one(related='invoice_id.currency_id', string='Currency')
     state = fields.Selection(related='invoice_id.state', string='State')
     amount_total = fields.Monetary(related='invoice_id.residual', string='Amount', digits=dp.get_precision('Product Price'), default=0)
-    alokasi = fields.Float(string='Alokasi', digits=dp.get_precision('Product Price'), default=0, required=True)
+    alokasi = fields.Float(string='Alokasi', digits=dp.get_precision('Product Price'), default=0, required=True, help='Masukkan semua total penyelesaian')
 
 class UudpPencairan(models.Model):
     _inherit = 'uudp.pencairan'

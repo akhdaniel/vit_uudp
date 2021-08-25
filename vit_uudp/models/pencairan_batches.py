@@ -7,7 +7,7 @@ from odoo.addons.terbilang import terbilang
 class pencairanBatches(models.Model):
     _name = 'pencairan.batches'
     _order = 'name desc'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string="Name", required=True, track_visibility='onchange')
     start_date = fields.Date(string="Start Date", track_visibility='onchange')

@@ -113,11 +113,12 @@
             <field name="condition">True</field>
             <field name="type">ir.actions.server</field>
             <field name="model_id" ref="account.model_account_move" />
+            <field name="binding_model_id" ref="account.model_account_move" />
             <field name="state">code</field>
             <field name="code">obj.browse(context.get('active_ids', [])).button_cancel()</field>
         </record>
 
-        <record model="ir.values" id="action_module_cancel_account_move">
+        <!-- <record model="ir.values" id="action_module_cancel_account_move">
             <field name="name">action_module_cancel_account_move</field>
             <field name="action_id" ref="action_server_cancel_account_move" />
             <field name="value" eval="'ir.actions.server,' + str(ref('action_server_cancel_account_move'))" />
@@ -125,6 +126,6 @@
             <field name="model_id" ref="account.model_account_move" />
             <field name="model">account.move</field>
             <field name="key2">client_action_multi</field>
-        </record>
+        </record> -->
 
 </odoo>

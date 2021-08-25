@@ -1,22 +1,21 @@
 {
-    "name": "Pengajuan Dana dan Reimberse untuk Pembelian Barang",
-    "version": "1.7",
-    "author": "vITtraining (Miftahussalam)",
+    "name": "Import Bank Statement",
+    "version": "1.1",
+    "author": "vitraining.com",
     "category": "Extra Tools",
     "website": "www.vitraining.com",
     "license": "AGPL-3",
     "summary": "",
     "description": """
-   *
-   * Update drop jurnal
-   *
-""",
+        Base module for Import Bank Statement.
+        Override the action_process() method to parse your custom bank statement import files.
+    """,
     "depends": [
-        "vit_uudp",
-        "vit_uudp_interco",
+        "account",
     ],
     "data":[
-        "views/uudp_view.xml",
+        "views/vit_bank_statement_import_view.xml",
+        "views/res_partner.xml",
         "security/ir.model.access.csv",
     ],
     "demo": [],

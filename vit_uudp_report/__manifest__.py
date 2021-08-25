@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name' : 'Custom UUDP Report',
-    'version' : '2.0',
+    'version' : '2.1',
     'summary': 'Custom report for uudp',
     'sequence': 16,
     'category': 'Extra Tools',

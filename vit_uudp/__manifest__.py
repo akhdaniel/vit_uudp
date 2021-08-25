@@ -20,7 +20,7 @@
 ##############################################################################
 {
     "name": "Pengajuan Dana dan Reimberse",
-    "version": "2.9",
+    "version": "3.0",
     "author": "vitraining.com",
     "category": "Extra Tools",
     "website": "www.vitraining.com",

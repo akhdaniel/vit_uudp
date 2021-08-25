@@ -20,7 +20,7 @@
 ##############################################################################
 {
     "name": "UUDP Inter Company",
-    "version": "1.0",
+    "version": "1.1",
     "category": "Extra Tools",
     "sequence": 20,
     "author":  "vITraining",

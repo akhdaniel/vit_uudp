@@ -7,7 +7,7 @@ from odoo.addons.terbilang import terbilang
 class uudpPencairan(models.Model):
     _name = 'uudp.pencairan'
     _order = 'name desc'
-    _inherit = ['mail.thread', 'ir.needaction_mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     #########################
     #Fungsi message discuss #
@@ -23,8 +23,8 @@ class uudpPencairan(models.Model):
         user_pencairan_partner_ids     = user_pencairan.users.mapped('partner_id')
         manager_pencairan_partner_ids  = manager_pencairan.users.mapped('partner_id')
 
-        user_pencairan_partners    =  map(lambda x:x['id'],user_pencairan_partner_ids)
-        manager_pencairan_partners =  map(lambda x:x['id'],manager_pencairan_partner_ids)
+        user_pencairan_partners    =  user_pencairan_partner_ids.ids
+        manager_pencairan_partners =  manager_pencairan_partner_ids.ids
 
         receivers = user_pencairan_partners + manager_pencairan_partners
 
@@ -49,7 +49,7 @@ class uudpPencairan(models.Model):
             messages = self.ajuan_id.message_post(body=body, subject=subject)
             messages.update({'needaction_partner_ids' : [(6, 0, [self.ajuan_id.user_id.partner_id.id])]})
 
-        print body
+        print(body)
         return True
 
 

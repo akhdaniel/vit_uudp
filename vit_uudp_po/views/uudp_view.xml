@@ -2,21 +2,21 @@
     <data>
         
         <record id="uudp_po_form_view" model="ir.ui.view">
-		    <field name="name">uudp.po.form</field>
-		    <field name="model">uudp</field>
-		    <field name="type">form</field>
-		    <field name="inherit_id" ref="vit_uudp.view_uudp_penyelesaian_form"/>
-		    <field name="arch" type="xml">
-		        
-		    	<field name="end_date" position="after">
-		    		<field name="is_po" attrs="{'readonly': ['|','&amp;',('state','=','confirm'),('is_user_pencairan','!=', True),('state','=','done')]}"/>
-		    	</field>
+            <field name="name">uudp.po.form</field>
+            <field name="model">uudp</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="vit_uudp.view_uudp_penyelesaian_form"/>
+            <field name="arch" type="xml">
+                
+                <field name="end_date" position="after">
+                    <field name="is_po" attrs="{'readonly': ['|','&amp;',('state','=','confirm'),('is_user_pencairan','!=', True),('state','=','done')]}"/>
+                </field>
 
                 <xpath expr="/form/sheet/notebook/page[@name='detail']" position="after">
                     <page name="detail_po" string="Detail PO" attrs="{'invisible': [('is_po','=',False)]}">
                         <group>
                             <group>
-                                <field name="advance_purchase_id" options="{'no_open': True, 'no_create': True}" domain="[('company_id','=',company_id),('reconcile','=',True)]" attrs="{'required': [('is_po','!=',False)], 'readonly': ['|','&amp;',('state','=','confirm'),('is_user_pencairan','!=', True),('state','=','done')]}"/>
+                                <field name="advance_purchase_id" options="{'no_open': True, 'no_create': True}" domain="[('company_id','=',company_id),('reconcile','=',True)]" attrs="{'readonly': ['|','&amp;',('state','=','confirm'),('is_user_pencairan','!=', True),('state','=','done')]}" invisible="1"/>
                             </group>
                             <group></group>
                         </group>
@@ -37,7 +37,7 @@
                     <page string="Detail Vendor Bills" attrs="{'invisible': [('is_po','=',False)]}">
                         <field name="invoice_line" attrs="{'readonly': ['|','&amp;',('state','!=','draft'),('is_user_pencairan','!=', True),('state','=','done')]}">
                             <tree editable="bottom">
-                                <field name="invoice_id" options="{'no_open': True, 'no_create': True}" domain="[('type','=','in_invoice'),('state','in',('open','draft')),('company_id','=',parent.company_id)]"/>
+                                <field name="invoice_id" options="{'no_open': True, 'no_create': True}" domain="[('type','=','in_invoice'),('state','=','open'),('company_id','=',parent.company_id)]"/>
                                 <field name="partner_id" readonly="True"/>
                                 <field name="company_id" readonly="True"/>
                                 <field name="state" readonly="True"/>
@@ -47,8 +47,8 @@
                         </field>
                     </page>
                 </xpath>
-		    	
-		     </field>
+                
+            </field>
 		</record>
         
     </data>

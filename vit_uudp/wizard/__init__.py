@@ -1,2 +1,2 @@
-import pencairan
+from . import pencairan
 # import parsial
